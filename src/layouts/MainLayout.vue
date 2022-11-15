@@ -4,7 +4,7 @@
       <q-header reveal bordered class="bg-white text-black">
         <q-toolbar>
           <q-toolbar-title
-            ><div class="text-center">Simple Notes</div></q-toolbar-title
+            ><div class="text-center">Simple Todo Tracker</div></q-toolbar-title
           >
         </q-toolbar>
       </q-header>

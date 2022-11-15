@@ -1,8 +1,8 @@
 {
   "name": "simple-notes",
   "version": "0.0.1",
-  "description": "A simple Todo List and Notes Web App",
-  "productName": "Simple Notes",
+  "description": "A simple Todo List Tracker and Notes Web App",
+  "productName": "Simple Todo Tracker",
   "author": "Isaque Reis <dosreisisaque@gmail.com>",
   "private": true,
   "scripts": {

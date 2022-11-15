@@ -134,7 +134,6 @@ export default defineComponent({
       },
       notify(type, position, message) {
         $q.notify({
-          group: false,
           timeout: 300000,
           type: type,
           position: position,
@@ -167,9 +166,9 @@ export default defineComponent({
         this.notify(
           'negative',
           'center',
-          `${task.name} is over (goal: ${task.timer.reference.label})`
+          `$time is over (goal: ${task.timer.reference.label})`
         );
-        task.timer.label = `${task.name} is over (goal: ${task.timer.reference.label})`;
+        task.timer.label = `time is over (goal: ${task.timer.reference.label})`;
         return;
       }
 
