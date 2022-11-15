@@ -164,7 +164,7 @@ export default defineComponent({
       description: '',
       tasks: [],
       countdown: 1,
-      mode: ref(false),
+      mode: ref(true),
     };
   },
   methods: {
@@ -181,7 +181,7 @@ export default defineComponent({
         this.notify(
           'negative',
           'center',
-          `time is over (goal: ${task.timer.reference.label})`
+          `time is over for task: ${task.name} (goal: ${task.timer.reference.label})`
         );
         task.timer.label = `time is over (goal: ${task.timer.reference.label})`;
         return;
@@ -249,9 +249,11 @@ export default defineComponent({
       for (let task of this.tasks) {
         ret += `${task.name};${task.description};${
           task.timer.mode === 'Countdown'
-            ? task.timer.reference.countdown
+            ? task.timer.countdown <= 0
+              ? task.timer.reference.countdown
+              : task.timer.countdown
             : task.timer.countdown
-        }\n`;
+        };${task.value ? 'Yes' : 'No'}\n`;
       }
       return ret;
     },
@@ -260,7 +262,7 @@ export default defineComponent({
         this.showLoading();
         const status = exportFile(
           `Todo_${new Date().toISOString()}.csv`,
-          `TASK;DESCRIPTION;ELAPSED_IN_SECONDS\n${this.toCsv()}`,
+          `TASK;DESCRIPTION;ELAPSED_IN_SECONDS;COMPLETED\n${this.toCsv()}`,
           { encoding: 'uft-8', mimeType: 'text/csv;charset=utf-8' }
         );
       } catch (error) {
