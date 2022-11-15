@@ -6,8 +6,6 @@ A simple Todo List tracker and Notes Web App
 
 ## Todo
 
-===========================================
-
 - [ ] Create backend
 - [ ] Generate daily/weekly/montly reports
 - [ ] Bug: when deleting the task, clear the task timer
