@@ -7,8 +7,10 @@ A simple Todo List tracker and Notes Web App
 ## Todo
 
 - [ ] Create backend
+- [x] Generate tasks report
 - [ ] Generate daily/weekly/montly reports
-- [ ] Bug: when deleting a task, clear the task timer
+- [x] Bug: when deleting a task, clear the task timer
+- [x] Tasklist scroller
 
 ## Install the dependencies
 

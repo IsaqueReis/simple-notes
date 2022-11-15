@@ -1,5 +1,5 @@
 <template>
-  <q-page class="container">
+  <q-page class="doc-container">
     <div class="row justify-end">
       <div class="col-12">
         <q-input
@@ -36,7 +36,7 @@
           outlined
           v-model="description"
           type="textarea"
-          label="Task"
+          label="Description"
           placeholder="enter your task description here"
           dense
         />
@@ -47,71 +47,86 @@
         <q-toggle v-model="mode" :label="mode ? 'Countdown' : 'Timer'" />
       </div>
     </div>
-    <div class="row q-mt-xl">
-      <q-item-label header v-if="tasks.length > 0">Tasks</q-item-label>
-      <div class="col-12" v-for="task in tasks" :key="task.value">
-        <q-item tag="label" v-ripple>
-          <q-item-section side top>
-            <q-checkbox
-              v-model="task.value"
-              @click="checkTask(task)"
-            ></q-checkbox>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label
-              ><div :class="task.value ? 'text-strike text-bold' : 'text-bold'">
-                {{ task.name }} -
-                <strong
-                  :style="
-                    task.timer.mode === 'Countdown'
-                      ? 'color: red'
-                      : 'color:blue'
-                  "
-                  >{{ task.timer.label }}</strong
+    <q-scroll-area style="height: 50vh; max-width: 100%">
+      <div class="row q-mt-xl">
+        <q-item-label header v-if="tasks.length > 0">Tasks</q-item-label>
+        <div class="col-12" v-for="task in tasks" :key="task.value">
+          <q-item tag="label" v-ripple>
+            <q-item-section side top>
+              <q-checkbox
+                v-model="task.value"
+                @click="checkTask(task)"
+              ></q-checkbox>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label
+                ><div
+                  :class="task.value ? 'text-strike text-bold' : 'text-bold'"
                 >
+                  {{ task.name }} -
+                  <strong
+                    :style="
+                      task.timer.mode === 'Countdown'
+                        ? 'color: red'
+                        : 'color:blue'
+                    "
+                    >{{ task.timer.label }}</strong
+                  >
+                </div>
+              </q-item-label>
+              <q-item-label caption>
+                <div :class="task.value ? 'text-strike' : ''">
+                  {{ task.description }}
+                </div>
+              </q-item-label>
+            </q-item-section>
+            <q-item-section top side>
+              <div class="q-gutter-xs">
+                <q-btn
+                  flat
+                  round
+                  class="gt-xs"
+                  icon="restart_alt"
+                  @click="restartTask(task)"
+                ></q-btn>
+                <q-btn
+                  color="red"
+                  flat
+                  round
+                  class="gt-xs"
+                  icon="play_arrow"
+                  @click="startTask(task)"
+                ></q-btn>
+                <q-btn
+                  flat
+                  round
+                  class="gt-xs"
+                  icon="pause"
+                  @click="pauseTask(task)"
+                ></q-btn>
+                <q-btn
+                  flat
+                  round
+                  class="gt-xs"
+                  icon="delete"
+                  @click="deleteTask(task)"
+                ></q-btn>
               </div>
-            </q-item-label>
-            <q-item-label caption>
-              <div :class="task.value ? 'text-strike' : ''">
-                {{ task.description }}
-              </div>
-            </q-item-label>
-          </q-item-section>
-          <q-item-section top side>
-            <div class="q-gutter-xs">
-              <q-btn
-                flat
-                round
-                class="gt-xs"
-                icon="restart_alt"
-                @click="restartTask(task)"
-              ></q-btn>
-              <q-btn
-                color="red"
-                flat
-                round
-                class="gt-xs"
-                icon="play_arrow"
-                @click="startTask(task)"
-              ></q-btn>
-              <q-btn
-                flat
-                round
-                class="gt-xs"
-                icon="pause"
-                @click="pauseTask(task)"
-              ></q-btn>
-              <q-btn
-                flat
-                round
-                class="gt-xs"
-                icon="delete"
-                @click="deleteTask(task)"
-              ></q-btn>
-            </div>
-          </q-item-section>
-        </q-item>
-        <q-separator inset="item" />
+            </q-item-section>
+          </q-item>
+          <q-separator inset="item" />
+        </div>
+      </div>
+    </q-scroll-area>
+    <div class="row justify-end">
+      <div class="col-2">
+        <q-btn
+          color="green"
+          icon-right="file_download"
+          label="Export"
+          @click.prevent="exportData"
+          style="width: 100%"
+        ></q-btn>
       </div>
     </div>
   </q-page>
@@ -119,7 +134,7 @@
 
 <script>
 import { defineComponent, ref } from 'vue';
-import { useQuasar } from 'quasar';
+import { useQuasar, exportFile } from 'quasar';
 
 export default defineComponent({
   name: 'IndexPage',
@@ -187,12 +202,8 @@ export default defineComponent({
       if (task.timer.timeoutFn) clearTimeout(task.timer.timeoutFn);
     },
     addTask() {
-      if (!this.description || !this.task) {
-        this.notify(
-          'negative',
-          'center',
-          `Please enter the task and its description!`
-        );
+      if (!this.task) {
+        this.notify('negative', 'center', `Please enter the task!`);
         return;
       }
       let mode = this.mode ? 'Countdown' : 'Timer';
@@ -224,6 +235,7 @@ export default defineComponent({
     deleteTask(task) {
       for (let i = 0; i < this.tasks.length; i++) {
         if (this.tasks[i].name == task.name) {
+          if (task.timer.timeoutFn) clearTimeout(task.timer.timeoutFn);
           this.tasks.splice(i, 1);
           break;
         }
@@ -231,6 +243,32 @@ export default defineComponent({
     },
     checkTask(task) {
       if (task.value) this.pauseTask(task);
+    },
+    toCsv() {
+      let ret = '';
+      for (let task of this.tasks) {
+        ret += `${task.name};${task.description};${
+          task.timer.mode === 'Countdown'
+            ? task.timer.reference.countdown
+            : task.timer.countdown
+        }\n`;
+      }
+      return ret;
+    },
+    exportData() {
+      try {
+        this.showLoading();
+        const status = exportFile(
+          `Todo_${new Date().toISOString()}.csv`,
+          `TASK;DESCRIPTION;ELAPSED_IN_SECONDS\n${this.toCsv()}`,
+          { encoding: 'uft-8', mimeType: 'text/csv;charset=utf-8' }
+        );
+      } catch (error) {
+        console.log(error);
+        //this.notify('negative', 'center', error);
+      } finally {
+        this.hideLoading();
+      }
     },
   },
 });
