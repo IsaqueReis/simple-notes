@@ -166,7 +166,7 @@ export default defineComponent({
         this.notify(
           'negative',
           'center',
-          `$time is over (goal: ${task.timer.reference.label})`
+          `time is over (goal: ${task.timer.reference.label})`
         );
         task.timer.label = `time is over (goal: ${task.timer.reference.label})`;
         return;
