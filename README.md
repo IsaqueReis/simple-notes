@@ -1,6 +1,8 @@
 # Simple Notes and Tasks (simple-notes)
 
-A simple Todo List and Notes Web App
+A simple Todo List tracker and Notes Web App
+
+![Alt text](todo-tracker.gif?raw=true "Exemplo de uso")
 
 ## Install the dependencies
 
