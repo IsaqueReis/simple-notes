@@ -4,23 +4,23 @@
       <div class="col-2">
         <q-btn
           color="red"
-          @click.prevent="goToOtherPage"
-          label="Go to other page"
+          @click.prevent="backToIndexPage"
+          label="Back to index page"
         />
       </div>
-      <div class="col text-center"><div>Index Page</div></div>
-    </div>
-  </q-page>
+      <div class="col text-center"><div>Other Page</div></div>
+    </div></q-page
+  >
 </template>
 
 <script>
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'IndexPage',
+  name: 'OtherPage',
   methods: {
-    goToOtherPage() {
-      this.$router.push({ name: 'OtherPage' });
+    backToIndexPage() {
+      this.$router.push({ name: 'IndexPage' });
     },
   },
 });
