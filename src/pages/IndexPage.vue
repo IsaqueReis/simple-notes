@@ -4,25 +4,47 @@
       <div class="col-12">
         <q-input
           outlined
-          v-model="description"
+          v-model="task"
           label="Task"
-          maxlength="500"
-          placeholder="enter your task description here"
+          placeholder="enter your task name here"
           dense
         >
           <template v-slot:append>
             <q-icon
-              v-if="description !== ''"
+              v-if="task !== ''"
               name="close"
-              @click="description = ''"
+              @click="task = ''"
               class="cursor-pointer"
             />
           </template>
-          <template v-slot:hint>Caracteres</template>
           <template v-slot:after>
+            <q-input
+              outlined
+              v-model="countdown"
+              type="number"
+              label="Time (in minutes)"
+              v-if="mode"
+            ></q-input>
             <q-btn round dense flat icon="add" @click="addTask"></q-btn>
           </template>
         </q-input>
+      </div>
+    </div>
+    <div class="row q-mt-md">
+      <div class="col-12">
+        <q-input
+          outlined
+          v-model="description"
+          type="textarea"
+          label="Task"
+          placeholder="enter your task description here"
+          dense
+        />
+      </div>
+    </div>
+    <div class="row q-mt-md">
+      <div class="col-12">
+        <q-toggle v-model="mode" :label="mode ? 'Countdown' : 'Timer'" />
       </div>
     </div>
     <div class="row q-mt-xl">
@@ -30,13 +52,23 @@
       <div class="col-12" v-for="task in tasks" :key="task.value">
         <q-item tag="label" v-ripple>
           <q-item-section side top>
-            <q-checkbox v-model="task.value"></q-checkbox>
+            <q-checkbox
+              v-model="task.value"
+              @click="checkTask(task)"
+            ></q-checkbox>
           </q-item-section>
           <q-item-section>
             <q-item-label
-              ><div :class="task.value ? 'text-strike' : ''">
+              ><div :class="task.value ? 'text-strike text-bold' : 'text-bold'">
                 {{ task.name }} -
-                <strong style="color: red">{{ task.timer.label }}</strong>
+                <strong
+                  :style="
+                    task.timer.mode === 'Countdown'
+                      ? 'color: red'
+                      : 'color:blue'
+                  "
+                  >{{ task.timer.label }}</strong
+                >
               </div>
             </q-item-label>
             <q-item-label caption>
@@ -47,6 +79,13 @@
           </q-item-section>
           <q-item-section top side>
             <div class="q-gutter-xs">
+              <q-btn
+                flat
+                round
+                class="gt-xs"
+                icon="restart_alt"
+                @click="restartTask(task)"
+              ></q-btn>
               <q-btn
                 color="red"
                 flat
@@ -72,55 +111,113 @@
             </div>
           </q-item-section>
         </q-item>
+        <q-separator inset="item" />
       </div>
     </div>
   </q-page>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'IndexPage',
+  setup() {
+    const $q = useQuasar();
+    return {
+      showLoading() {
+        $q.loading.show();
+      },
+      hideLoading() {
+        $q.loading.hide();
+      },
+      notify(type, position, message) {
+        $q.notify({
+          group: false,
+          timeout: 300000,
+          type: type,
+          position: position,
+          message: message,
+          actions: [{ label: 'Dismiss', color: 'yellow', handler: () => {} }],
+        });
+      },
+    };
+  },
   data() {
     return {
+      task: '',
       description: '',
       tasks: [],
-      countdown: 300,
+      countdown: 1,
+      mode: ref(false),
     };
   },
   methods: {
+    restartTask(task) {
+      if (task.timer.timeoutFn) clearTimeout(task.timer.timeoutFn);
+
+      task.timer.countdown = task.timer.reference.countdown;
+      task.timer.label = task.timer.reference.label;
+      task.value = false;
+    },
     startTask(task) {
-      if (task.timer.countdown > 0) {
-        task.timer.timeoutFn = setTimeout(() => {
-          task.timer.countdown -= 1;
-          let minutes = parseInt(task.timer.countdown / 60, 10);
-          let seconds = parseInt(task.timer.countdown % 60, 10);
-          task.timer.label = `${minutes < 10 ? '0' + minutes : minutes}:${
-            seconds < 10 ? '0' + seconds : seconds
-          }`;
-          this.startTask(task);
-        }, 1000);
-      }
-    },
-    pauseTask(task) {
-      clearTimeout(task.timer.timeoutFn);
-    },
-    addTask() {
-      if (!this.description) {
+      if (task.value) return;
+      if (task.timer.mode === 'Countdown' && task.timer.countdown <= 0) {
+        this.notify(
+          'negative',
+          'center',
+          `${task.name} is over (goal: ${task.timer.reference.label})`
+        );
+        task.timer.label = `${task.name} is over (goal: ${task.timer.reference.label})`;
         return;
       }
-      let minutes = parseInt(this.countdown / 60, 10);
-      let seconds = parseInt(this.countdown, 10);
+
+      task.timer.timeoutFn = setTimeout(() => {
+        if (task.timer.mode === 'Countdown') task.timer.countdown -= 1;
+        else task.timer.countdown += 1;
+        let minutes = parseInt(task.timer.countdown / 60, 10);
+        let seconds = parseInt(task.timer.countdown % 60, 10);
+        task.timer.label = `${minutes < 10 ? '0' + minutes : minutes}:${
+          seconds < 10 ? '0' + seconds : seconds
+        }`;
+        this.startTask(task);
+      }, 1000);
+    },
+    pauseTask(task) {
+      if (task.timer.timeoutFn) clearTimeout(task.timer.timeoutFn);
+    },
+    addTask() {
+      if (!this.description || !this.task) {
+        this.notify(
+          'negative',
+          'center',
+          `Please enter the task and its description!`
+        );
+        return;
+      }
+      let mode = this.mode ? 'Countdown' : 'Timer';
+      let countdownInSeconds = this.countdown * 60;
+      let minutes = parseInt(countdownInSeconds / 60, 10);
+      let seconds = parseInt(countdownInSeconds % 60, 10);
+      let label =
+        mode === 'Countdown'
+          ? `${minutes < 10 ? '0' + minutes : minutes}:${
+              seconds < 10 ? '0' + seconds : seconds
+            }`
+          : '00:00';
       this.tasks.push({
-        name: `Task ${this.tasks.length + 1}`,
+        name: this.task,
         description: this.description,
         value: false,
         timer: {
-          countdown: this.countdown,
-          label: `${minutes < 10 ? '0' + minutes : minutes}:${
-            seconds < 10 ? '0' + seconds : seconds
-          }`,
+          reference: {
+            countdown: mode === 'Countdown' ? countdownInSeconds : 0,
+            label: label,
+          },
+          mode: mode,
+          countdown: mode === 'Countdown' ? countdownInSeconds : 0,
+          label: label,
         },
         timeoutFn: null,
       });
@@ -132,6 +229,9 @@ export default defineComponent({
           break;
         }
       }
+    },
+    checkTask(task) {
+      if (task.value) this.pauseTask(task);
     },
   },
 });
