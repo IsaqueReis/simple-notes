@@ -2,7 +2,15 @@
 
 A simple Todo List tracker and Notes Web App
 
-![Alt text](todo-tracker.gif?raw=true "Exemplo de uso")
+![Alt text](todo-tracker.gif?raw=true 'Exemplo de uso')
+
+## Todo
+
+===========================================
+
+- [ ] Create backend
+- [ ] Generate daily/weekly/montly reports
+- [ ] Bug: when deleting the task, clear the task timer
 
 ## Install the dependencies
 

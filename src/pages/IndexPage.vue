@@ -224,8 +224,6 @@ export default defineComponent({
     deleteTask(task) {
       for (let i = 0; i < this.tasks.length; i++) {
         if (this.tasks[i].name == task.name) {
-          if (this.tasks[i].timer.timeoutFn)
-            clearTimeout(this.tasks[i].timer.timeoutFn);
           this.tasks.splice(i, 1);
           break;
         }
