@@ -47,7 +47,7 @@
         <q-toggle v-model="mode" :label="mode ? 'Countdown' : 'Timer'" />
       </div>
     </div>
-    <q-scroll-area style="height: 50vh; max-width: 100%">
+    <q-scroll-area style="height: 55vh; max-width: 100%">
       <div class="row q-mt-xl">
         <q-item-label header v-if="tasks.length > 0">Tasks</q-item-label>
         <div class="col-12" v-for="task in tasks" :key="task.value">
@@ -118,7 +118,7 @@
         </div>
       </div>
     </q-scroll-area>
-    <div class="row justify-end">
+    <div class="row justify-end q-mt-lg">
       <div class="col-2">
         <q-btn
           color="green"
