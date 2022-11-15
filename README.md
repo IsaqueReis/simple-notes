@@ -2,6 +2,8 @@
 
 A simple Todo List tracker and Notes Web App
 
+![Alt text](todo-tracker.gif?raw=true "Exemplo de uso")
+
 ## Install the dependencies
 
 ```bash
