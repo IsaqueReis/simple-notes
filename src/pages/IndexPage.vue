@@ -184,6 +184,7 @@ export default defineComponent({
           `time is over for task: ${task.name} (goal: ${task.timer.reference.label})`
         );
         task.timer.label = `time is over (goal: ${task.timer.reference.label})`;
+        task.working = false;
         return;
       }
 
@@ -195,11 +196,15 @@ export default defineComponent({
         task.timer.label = `${minutes < 10 ? '0' + minutes : minutes}:${
           seconds < 10 ? '0' + seconds : seconds
         }`;
+        task.working = true;
         this.startTask(task);
       }, 1000);
     },
     pauseTask(task) {
-      if (task.timer.timeoutFn) clearTimeout(task.timer.timeoutFn);
+      if (task.timer.timeoutFn) {
+        clearTimeout(task.timer.timeoutFn);
+        task.working = false;
+      }
     },
     addTask() {
       if (!this.task) {
@@ -229,6 +234,7 @@ export default defineComponent({
           countdown: mode === 'Countdown' ? countdownInSeconds : 0,
           label: label,
         },
+        working: false,
         timeoutFn: null,
       });
     },
@@ -247,11 +253,14 @@ export default defineComponent({
     toCsv() {
       let ret = '';
       for (let task of this.tasks) {
-        ret += `${task.name};${task.description};${
+        ret += `${task.name.replace('\n', '\t')};${task.description.replace(
+          '\n',
+          '\t'
+        )};${
           task.timer.mode === 'Countdown'
             ? task.timer.countdown <= 0
               ? task.timer.reference.countdown
-              : task.timer.countdown
+              : task.timer.reference.countdown - task.timer.countdown
             : task.timer.countdown
         };${task.value ? 'Yes' : 'No'}\n`;
       }

@@ -11,6 +11,11 @@ A simple Todo List tracker and Notes Web App
 - [ ] Generate daily/weekly/montly reports
 - [x] Bug: when deleting a task, clear the task timer
 - [x] Tasklist scroller
+- [ ] Register daily schedule work hours goal
+- [ ] Integrate with notifications API
+- [ ] Automatic "idle time" timer
+- [ ] Create calendar visualization Daily/Weekly/Montly
+- [ ] Create quick anotations
 
 ## Install the dependencies
 
