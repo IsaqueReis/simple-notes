@@ -164,7 +164,7 @@ export default defineComponent({
       description: '',
       tasks: [],
       countdown: 1,
-      mode: ref(true),
+      mode: ref(false),
     };
   },
   methods: {
@@ -221,7 +221,7 @@ export default defineComponent({
               seconds < 10 ? '0' + seconds : seconds
             }`
           : '00:00';
-      this.tasks.push({
+      this.tasks.unshift({
         name: this.task,
         description: this.description,
         value: false,
@@ -248,7 +248,15 @@ export default defineComponent({
       }
     },
     checkTask(task) {
-      if (task.value) this.pauseTask(task);
+      if (task.value) {
+        for (let i = 0; i < this.tasks.length; i++) {
+          if (this.tasks[i].name == task.name) {
+            this.tasks.push(this.tasks.splice(i, 1)[0]);
+            this.pauseTask(task);
+            break;
+          }
+        }
+      }
     },
     toCsv() {
       let ret = '';

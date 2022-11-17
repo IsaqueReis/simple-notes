@@ -16,6 +16,7 @@ A simple Todo List tracker and Notes Web App
 - [ ] Automatic "idle time" timer
 - [ ] Create calendar visualization Daily/Weekly/Montly
 - [ ] Create quick anotations
+- [ ] Create Reward System
 
 ## Install the dependencies
 
