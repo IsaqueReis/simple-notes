@@ -221,7 +221,7 @@ export default defineComponent({
               seconds < 10 ? '0' + seconds : seconds
             }`
           : '00:00';
-      this.tasks.unshift({
+      this.tasks.push({
         name: this.task,
         description: this.description,
         value: false,
@@ -284,7 +284,6 @@ export default defineComponent({
         );
       } catch (error) {
         console.log(error);
-        //this.notify('negative', 'center', error);
       } finally {
         this.hideLoading();
       }
